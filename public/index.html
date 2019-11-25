@@ -1,0 +1,35 @@
+<script>
+const socket = new WebSocket("ws://127.0.0.1:3012");
+let iterator = 1;
+let maxPlays = 1;
+
+socket.onopen = function(e) {
+    socket.send("init");
+};
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    maxPlays = data.max_plays;
+    const relativePath = data.file_path.replace(/\/public/g, '.');
+    const element = document.getElementById("video");
+    element.src = relativePath;
+    element.play();
+    iterator += 1;
+};
+
+socket.onerror = function(error) {
+  console.log(`[error]`, error);
+};
+
+
+function videoEnd(element) {
+    if (iterator > maxPlays && maxPlays !== 0) {
+        return;
+    }
+    socket.send("video_ended");
+}
+</script>
+
+<video id="video" onended="videoEnd(this)" controls autoplay muted>
+    <source type="video/mp4" />
+</video>

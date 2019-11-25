@@ -1,0 +1,4 @@
+/target
+**/*.rs.bk
+public/videos/*.mp4
+.DS_Store
