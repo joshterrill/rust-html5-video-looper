@@ -1,7 +1,7 @@
 <script>
 const socket = new WebSocket("ws://127.0.0.1:3012");
 let iterator = 1;
-let maxPlays = 1;
+let maxPlays = 0;
 
 socket.onopen = function(e) {
     socket.send("init");
@@ -23,7 +23,7 @@ socket.onerror = function(error) {
 
 
 function videoEnd(element) {
-    if (iterator > maxPlays && maxPlays !== 0) {
+    if (iterator > maxPlays && maxPlays > 0) {
         return;
     }
     socket.send("video_ended");

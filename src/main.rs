@@ -7,7 +7,6 @@ use ws::{listen, Message, Handler, Sender};
 use serde::{Deserialize, Serialize};
 use serde_json;
 
-
 struct Server {
     ws: Sender,
     file_path: String,
@@ -30,8 +29,6 @@ impl Handler for Server {
         Ok(())
     }
 }
-
-
 
 fn generate_random_number(count: usize) -> usize {
     rand::thread_rng().gen_range(0, count)
