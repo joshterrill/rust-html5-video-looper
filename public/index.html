@@ -3,12 +3,16 @@ const socket = new WebSocket("ws://127.0.0.1:3012");
 let iterator = 1;
 let maxPlays = 0;
 
-socket.onopen = function(e) {
+socket.onopen = (e) => {
     socket.send("init");
 };
 
-socket.onmessage = function(event) {
+socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
+    if (data.error) {
+        alert(`Error: ${data.error}`);
+        return;
+    }
     maxPlays = data.max_plays;
     const relativePath = data.file_path.replace(/\/public/g, '.');
     const element = document.getElementById("video");
@@ -17,7 +21,7 @@ socket.onmessage = function(event) {
     iterator += 1;
 };
 
-socket.onerror = function(error) {
+socket.onerror = (error) => {
   console.log(`[error]`, error);
 };
 
