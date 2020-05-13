@@ -7,9 +7,10 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::{env, fs, thread};
 use ws::{listen, Handler, Message, Sender};
+use anyhow::Result;
 
 struct Error {
-    message: String,
+    pub message: String,
 }
 
 struct Server {
@@ -25,12 +26,10 @@ struct ClientPayload {
     error: Option<String>,
 }
 
-// type Result<T> = std::result::Result<T, Error>;
-
 impl<T: std::error::Error> From<T> for Error {
     fn from(err: T) -> Self {
         Error {
-            message: err.description().to_owned(),
+            message: err.to_string(),
         }
     }
 }
@@ -47,7 +46,7 @@ impl Handler for Server {
                 self.ws.send(serde_json::to_string(&item).unwrap()).unwrap();
                 Ok(())
             }
-            Err(error) => {
+            Err(_error) => {
                 // println!("Error: {:?}", error.message);
                 Ok(())
             }
@@ -83,20 +82,25 @@ fn init_websockets(file_path: String, max_plays: usize) {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let file_path = args[2].to_string();
-    let max_plays = args[4].to_string();
+    if args.len() != 5 {
+        println!("Must enter required parameters, i.e. ./rust-html5-video-looper path ./public/videos maxplays 20")
+    } else {
+        let file_path = args[2].to_string();
+        let max_plays = args[4].to_string();
 
-    let mut threads = vec![];
+        let mut threads = vec![];
 
-    threads.push(thread::spawn(move || {
-        init_rocket();
-    }));
+        threads.push(thread::spawn(move || {
+            init_rocket();
+        }));
 
-    threads.push(thread::spawn(move || {
-        init_websockets(file_path, max_plays.parse::<usize>().unwrap());
-    }));
+        threads.push(thread::spawn(move || {
+            init_websockets(file_path, max_plays.parse::<usize>().unwrap());
+        }));
 
-    for thread in threads {
-        let _ = thread.join();
+        for thread in threads {
+            let _ = thread.join();
+        }
     }
+    
 }
